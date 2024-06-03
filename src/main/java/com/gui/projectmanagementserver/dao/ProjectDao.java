@@ -398,6 +398,52 @@ public class ProjectDao{
         return null ;
     }
 
+    public boolean deleteProject(String project_id) {
+        Connection connection = JDBC_Client.getConnection();
+        try {
+            String sql = "DELETE FROM projects WHERE projects.project_id = ? ;" ;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, project_id);
+            int result = ps.executeUpdate() ;
+            if (result != 0) {
+                return true ;
+            } else {
+                return false ;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false ;
+        } finally {
+            closeConnection(connection);
+        }
+    }
+
+    public boolean isManager(String client_id, String project_id) {
+        Connection connection = JDBC_Client.getConnection();
+        try {
+            String sql = "SELECT * FROM members WHERE members.member_id = ? AND members.project_id = ?" ;
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, client_id);
+            ps.setString(2, project_id);
+            ResultSet rs = ps.executeQuery() ;
+            if (rs.next()) {
+                String role = rs.getString("role") ;
+                if (role.equals("Manager")) {
+                    return true ;
+                } else {
+                    return false ;
+                }
+            } else {
+                return false ;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false ;
+        } finally {
+            closeConnection(connection);
+        }
+    }
+
     public static void closeConnection(Connection connection) {
         try {
             connection.close();
